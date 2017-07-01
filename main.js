@@ -1,8 +1,4 @@
-const electron = require('electron')
-// Module to control application life.
-const app = electron.app
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
+const {app, BrowserWindow} = require('electron')
 
 const path = require('path')
 const url = require('url')
@@ -23,7 +19,7 @@ function createWindow () {
   }))
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -56,5 +52,10 @@ app.on('activate', function () {
   }
 })
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.
+process.on('error', function(err) {
+  console.log(err);
+});
+
+// Uncomment to use remote debug tools.
+// app.commandLine.appendSwitch('remote-debugging-port', '8315');
+// app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1');

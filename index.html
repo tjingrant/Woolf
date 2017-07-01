@@ -1,19 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html  ng-app="woolfApp">
   <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
-  </body>
+    <title>Woolf</title>
 
-  <script>
-    // You can also require other files to run in this process
-    require('./renderer.js')
-  </script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="./css/photon.css">
+    <link rel="stylesheet" href="./css/app.css">
+
+    <!-- Javascript -->
+    <script src="./bower_components/angular/angular.js"></script>
+    <script src="./js/common.js" charset="utf-8"></script>
+    <script src="./js/app.js" charset="utf-8"></script>
+    <script>window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');</script>
+
+  </head>
+  <body ng-controller="woolfController">
+    <div class="window">
+      <div class="window-content">
+        <div class="pane-group">
+          <div class="pane pane-sm sidebar">
+            <ul class="list-group">
+              <li class="list-group-header">
+                <input class="form-control" type="text" placeholder="Search for anything.">
+              </li>
+            </ul>
+            <nav class="nav-group" id="recent-files">
+              <h4 class="nav-group-title">Recent</h4>
+              <span class='nav-group-item' ng-class='{active : isFileNameSelected(file)}' ng-repeat="file in files" ng-click="loadFile(file)">{{file}}</span>
+            </nav>
+          </div>
+
+          <div class="pane">
+              <div class="btn-group" style="margin:1em">
+                <button class="btn btn-default code" onclick="code_mode()">
+                  <span class="icon icon-code"></span>
+                </button>
+
+                <button class="btn btn-default text-code text active" onclick="text_mode()">
+                  <span class="icon icon-quote"></span>
+                </button>
+              </div>
+
+              <div id="text-display" style="margin:0em 1em;"></div>
+              <textarea id="text-edit" style="outline:none;width:100%;height:90%;padding:1em;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var fs = require('fs');
+      var _marked = require('marked');
+      _marked.setOptions({
+        highlight: function (code) {
+          return require('highlight.js').highlightAuto(code).value;
+        }
+      });
+
+      String.prototype.hashCode = function(){
+        var hash = 0;
+        if (this.length == 0) return hash;
+        for (i = 0; i < this.length; i++) {
+          char = this.charCodeAt(i);
+          hash = ((hash<<5)-hash)+char;
+          hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash;
+      }
+
+      function marked(code) {
+        compiled = _marked(code);
+        function replacer(match, p1, offset, string) {
+          rtn = "<div>"
+          tags = p1.split(",");
+          for (var i=0; i<tags.length; i++) {
+            var choices = ["btn-default","btn-primary","btn-positive","btn-negative","btn-warning"]
+            var num = Math.abs(tags[i].hashCode()) % choices.length
+            var choice = choices[num]
+            rtn = rtn + (["<span class='btn ", choice, "' style='margin:0.2em'>", tags[i], "</span>"].join(""));
+          }
+          rtn += "</div>"
+          return rtn;
+        }
+        compiled = compiled.replace(/tag:([a-z\,-]+)/g, replacer);
+        return compiled;
+      }
+
+      function text_mode() {
+        $(".code").removeClass("active");
+        $(".text").addClass("active");
+        $("#text-display").html(marked($("#text-edit").val()));
+        $('#text-display').find('*').css('-webkit-user-select', 'text');
+        $("#text-edit").hide();
+        $("#text-display").show();
+      }
+
+      function code_mode() {
+        $(".text").removeClass("active");
+        $(".code").addClass("active");
+        $("#text-display").hide();
+        $("#text-edit").show();
+      }
+
+      var path = "/Users/tian.jin/Documents/log";
+      var current_file = ""
+
+      function init() {
+        $("#text-edit").hide();
+      }
+
+      //open links externally by default
+
+      $( document ).ready(function() {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+
+        if(dd<10) {
+            dd = '0'+dd
+        } 
+
+        if(mm<10) {
+            mm = '0'+mm
+        } 
+        today_str = mm + '-' + dd + '-' + yyyy;
+
+        var _path = require('path'); 
+
+        fs.stat(path + "/" + today_str + ".log.md", function(err, stat) {
+            if(err == null) {
+                console.log('File exists');
+            } else if(err.code == 'ENOENT') {
+              fs.writeFile(path + "/" + today_str + ".log.md", "" , function(err) {
+                  init();
+              });
+              fs.mkdirSync(path + "/" + today_str);
+            } else {
+                console.log('Some other error: ', err.code);
+            }
+        });
+
+        init();
+        $('#text-edit').on('input propertychange paste', function() {
+          fs.writeFile(path + "/" + current_file + ".log.md", $('#text-edit').val() , function(err) {
+              if(err) {
+                  return console.log(err);
+              }
+
+              console.log("The file was saved!");
+          });
+        });
+
+      });
+    </script>
+  </body>
 </html>

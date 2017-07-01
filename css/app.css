@@ -1,0 +1,5 @@
+textarea { 
+    border-style: none; 
+    border-color: Transparent; 
+    overflow: auto;        
+  }
