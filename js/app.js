@@ -33,7 +33,7 @@ woolfApp.controller('woolfController', function woolfController($scope) {
     $scope.selectedFileName = file;
     $(this).addClass("active");
     fs.readFile(path + "/" + file + ".log.md", 'utf8', function(err, data) {
-      $("#text-display").html(marked(data));
+      $("#text-display").html(markdown.compile(data));
       $('#text-display').find('*').css('-webkit-user-select', 'text');
       $("#text-edit").val(data);
     });

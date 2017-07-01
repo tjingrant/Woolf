@@ -7,11 +7,14 @@
     <link rel="stylesheet" href="./css/photon.css">
     <link rel="stylesheet" href="./css/app.css">
 
-    <!-- Javascript -->
+    <!-- External Javascript -->
     <script src="./bower_components/angular/angular.js"></script>
-    <script src="./js/common.js" charset="utf-8"></script>
-    <script src="./js/app.js" charset="utf-8"></script>
     <script>window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');</script>
+
+    <!-- Internal Javascript -->
+    <script src="./js/common.js" charset="utf-8"></script>
+    <script src="./js/markdown.js"></script>
+    <script src="./js/app.js" charset="utf-8"></script>
 
   </head>
   <body ng-controller="woolfController">
@@ -50,46 +53,11 @@
 
     <script type="text/javascript">
       var fs = require('fs');
-      var _marked = require('marked');
-      _marked.setOptions({
-        highlight: function (code) {
-          return require('highlight.js').highlightAuto(code).value;
-        }
-      });
-
-      String.prototype.hashCode = function(){
-        var hash = 0;
-        if (this.length == 0) return hash;
-        for (i = 0; i < this.length; i++) {
-          char = this.charCodeAt(i);
-          hash = ((hash<<5)-hash)+char;
-          hash = hash & hash; // Convert to 32bit integer
-        }
-        return hash;
-      }
-
-      function marked(code) {
-        compiled = _marked(code);
-        function replacer(match, p1, offset, string) {
-          rtn = "<div>"
-          tags = p1.split(",");
-          for (var i=0; i<tags.length; i++) {
-            var choices = ["btn-default","btn-primary","btn-positive","btn-negative","btn-warning"]
-            var num = Math.abs(tags[i].hashCode()) % choices.length
-            var choice = choices[num]
-            rtn = rtn + (["<span class='btn ", choice, "' style='margin:0.2em'>", tags[i], "</span>"].join(""));
-          }
-          rtn += "</div>"
-          return rtn;
-        }
-        compiled = compiled.replace(/tag:([a-z\,-]+)/g, replacer);
-        return compiled;
-      }
 
       function text_mode() {
         $(".code").removeClass("active");
         $(".text").addClass("active");
-        $("#text-display").html(marked($("#text-edit").val()));
+        $("#text-display").html(markdown.compile($("#text-edit").val()));
         $('#text-display').find('*').css('-webkit-user-select', 'text');
         $("#text-edit").hide();
         $("#text-display").show();
@@ -109,25 +77,10 @@
         $("#text-edit").hide();
       }
 
-      //open links externally by default
-
       $( document ).ready(function() {
-        var today = new Date();
-        var dd = today.getDate();
-        var mm = today.getMonth()+1; //January is 0!
-        var yyyy = today.getFullYear();
-
-        if(dd<10) {
-            dd = '0'+dd
-        } 
-
-        if(mm<10) {
-            mm = '0'+mm
-        } 
-        today_str = mm + '-' + dd + '-' + yyyy;
-
         var _path = require('path'); 
 
+        today_str = utility.getDateString();
         fs.stat(path + "/" + today_str + ".log.md", function(err, stat) {
             if(err == null) {
                 console.log('File exists');
