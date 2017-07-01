@@ -37,7 +37,7 @@ woolfApp.controller('woolfController', function woolfController($scope) {
       $('#text-display').find('*').css('-webkit-user-select', 'text');
       $("#text-edit").val(data);
     });
-  }
+  };
 
   $scope.isFileNameSelected = function(fileName) {
     return $scope.selectedFileName === fileName;
