@@ -1,12 +1,12 @@
 {
   "name": "Woolf",
   "version": "0.0.1",
-  "description": "Woolf is a reasonably configured personal knowledge management utility for hackers.",
+  "description": "Woolf is a work journal for hackers.",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/tjingrant/Woolf.git",
   "keywords": [],
   "author": "GitHub",
   "license": "CC0-1.0",
