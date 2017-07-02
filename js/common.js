@@ -1,5 +1,5 @@
 var utility = {
-  getDateString: function(str) {
+  getDateString : function(str) {
     var today = new Date();
     var dd = today.getDate();
     var mm = today.getMonth() + 1; //January is 0!
@@ -23,5 +23,12 @@ var utility = {
       hash = hash & hash; // Convert to 32bit integer
     }
     return Math.abs(hash);
+  },
+  objectifyForm : function(formArray) {//serialize data function
+    var returnArray = {};
+    for (var i = 0; i < formArray.length; i++){
+      returnArray[formArray[i]['name']] = formArray[i]['value'];
+    }
+    return returnArray;
   }
 };

@@ -4,11 +4,13 @@
     <title>Woolf</title>
 
     <!-- Stylesheets -->
+    <link rel="stylesheet" href="./bower_components/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="./css/photon.css">
     <link rel="stylesheet" href="./css/app.css">
 
     <!-- External Javascript -->
     <script src="./bower_components/angular/angular.js"></script>
+    <script src="./bower_components/angular-ui-router/release/angular-ui-router.js"></script>
     <script>window.$ = window.jQuery = require('./bower_components/jquery/dist/jquery.min.js');</script>
 
     <!-- Internal Javascript -->
@@ -23,89 +25,31 @@
         <div class="pane-group">
           <div class="pane pane-sm sidebar">
             <ul class="list-group">
+              <!-- 
               <li class="list-group-header">
                 <input class="form-control" type="text" placeholder="Search for anything.">
               </li>
+               -->
             </ul>
             <nav class="nav-group" id="recent-files">
-              <h4 class="nav-group-title">Recent</h4>
-              <span class='nav-group-item' ng-class='{active : isFileNameSelected(file)}' ng-repeat="file in files" ng-click="loadFile(file)">{{file}}</span>
+              <h3 class="nav-group-title">Recent</h3>
+              <span style="color:#555555" class='nav-group-item' ng-class='{active : isFileNameSelected(file)}' ng-repeat="file in files" ng-click="loadFile(file)">{{file}}</span>
             </nav>
+            <footer class="toolbar toolbar-footer" style="position:absolute;bottom:0px;width:100%;">
+              <div class="toolbar-actions">
+                <button class="btn btn-default">
+                  <span class="icon icon-cog" ng-click="goto('configure')"></span>
+                </button>
+              </div>
+            </footer>
           </div>
 
           <div class="pane">
-              <div class="btn-group" style="margin:1em">
-                <button class="btn btn-default code" onclick="code_mode()">
-                  <span class="icon icon-code"></span>
-                </button>
-
-                <button class="btn btn-default text-code text active" onclick="text_mode()">
-                  <span class="icon icon-quote"></span>
-                </button>
-              </div>
-
-              <div id="text-display" style="margin:0em 1em;"></div>
-              <textarea id="text-edit" style="outline:none;width:100%;height:90%;padding:1em;"></textarea>
+            <div ui-view style="height:100%">
+            </div>
           </div>
         </div>
       </div>
     </div>
-
-    <script type="text/javascript">
-      var fs = require('fs');
-
-      function text_mode() {
-        $(".code").removeClass("active");
-        $(".text").addClass("active");
-        $("#text-display").html(markdown.compile($("#text-edit").val()));
-        $('#text-display').find('*').css('-webkit-user-select', 'text');
-        $("#text-edit").hide();
-        $("#text-display").show();
-      }
-
-      function code_mode() {
-        $(".text").removeClass("active");
-        $(".code").addClass("active");
-        $("#text-display").hide();
-        $("#text-edit").show();
-      }
-
-      var path = "/Users/tian.jin/Documents/log";
-      var current_file = ""
-
-      function init() {
-        $("#text-edit").hide();
-      }
-
-      $( document ).ready(function() {
-        var _path = require('path'); 
-
-        today_str = utility.getDateString();
-        fs.stat(path + "/" + today_str + ".log.md", function(err, stat) {
-            if(err == null) {
-                console.log('File exists');
-            } else if(err.code == 'ENOENT') {
-              fs.writeFile(path + "/" + today_str + ".log.md", "" , function(err) {
-                  init();
-              });
-              fs.mkdirSync(path + "/" + today_str);
-            } else {
-                console.log('Some other error: ', err.code);
-            }
-        });
-
-        init();
-        $('#text-edit').on('input propertychange paste', function() {
-          fs.writeFile(path + "/" + current_file + ".log.md", $('#text-edit').val() , function(err) {
-              if(err) {
-                  return console.log(err);
-              }
-
-              console.log("The file was saved!");
-          });
-        });
-
-      });
-    </script>
   </body>
 </html>
