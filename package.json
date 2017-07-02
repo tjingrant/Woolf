@@ -7,8 +7,7 @@
     "start": "electron ."
   },
   "repository": "https://github.com/electron/electron-quick-start",
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "GitHub",
   "license": "CC0-1.0",
   "devDependencies": {},
@@ -16,6 +15,7 @@
     "bower": "^1.8.0",
     "electron": "^1.6.11",
     "highlight.js": "^9.12.0",
-    "marked": "^0.3.6"
+    "marked": "^0.3.6",
+    "sqlite3": "^3.1.8"
   }
 }
